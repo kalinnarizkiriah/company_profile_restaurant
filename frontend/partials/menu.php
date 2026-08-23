@@ -63,7 +63,7 @@ function make_slug($text) {
                      $path_gambar = "../backend/img/" . $nama_file;
                  } elseif (!empty($nama_file) && file_exists("../backend/img/category/" . $nama_file)) {
                      $path_gambar = "../backend/img/category/" . $nama_file;
-                 } elseif (file_exists("../backend/img/category/" . $judul_menu . ".jpg")) {
+                 } elseif (!empty($judul_menu) && file_exists("../backend/img/category/" . $judul_menu . ".jpg")) {
                      $path_gambar = "../backend/img/category/" . $judul_menu . ".jpg";
                  } else {
                      $path_gambar = "../backend/img/category/burgers.jpg";
@@ -97,8 +97,7 @@ function make_slug($text) {
                
                <div class="mimg">
                   <img src="<?= $path_gambar; ?>" alt="<?= htmlspecialchars($row->title ?? 'Menu'); ?>"/>
-                  <div class="mbdg hot"><i class="fas fa-star"></i> <?= htmlspecialchars($row->rating ?? '5.0'); ?></div>
-                  <div class="mhrt"><i class="far fa-heart"></i></div>
+                  <div class="mbdg hot"><i class="fa-solid fa-star"></i> <?= htmlspecialchars($row->rating ?? '5.0'); ?></div>
                </div>
                
                <div class="mbody">
@@ -109,7 +108,7 @@ function make_slug($text) {
                      <div>
                         <div class="mprice"><?= $formatted_price; ?></div>
                         <div class="mstars">
-                           <i class="fas fa-star"></i> <span style="color:#bbb;font-size:.7rem;">(<?= htmlspecialchars($row->rating ?? '5.0'); ?>)</span>
+                           <i class="fa-solid fa-star"></i> <span style="color:#bbb;font-size:.7rem;">(<?= htmlspecialchars($row->rating ?? '5.0'); ?>)</span>
                         </div>
                      </div>
                      <!-- TOMBOL TAMBAH KE KERANJANG -->
@@ -121,7 +120,7 @@ function make_slug($text) {
                              data-nama="<?= htmlspecialchars($row->title ?? ''); ?>"
                              data-harga="<?= $raw_price; ?>"
                              data-gambar="<?= $path_gambar; ?>">
-                        <i class="fas fa-plus"></i>
+                        <i class="fa-solid fa-plus"></i>
                      </button>
                   </div>
                </div>
@@ -206,13 +205,15 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    const cartBadge = document.querySelector('[data-bs-target="#modalKeranjang"] .badge');
-                    if (cartBadge) {
-                        cartBadge.textContent = data.total_items;
-                    }
+                    // Update badge keranjang di navbar/header
+                    const cartBadges = document.querySelectorAll('[data-bs-target="#modalKeranjang"] .badge, .cart-badge');
+                    cartBadges.forEach(badge => {
+                        badge.textContent = data.total_items;
+                    });
 
+                    // Efek tombol berubah hijau centang sementara
                     const originalHTML = btn.innerHTML;
-                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i>';
                     btn.classList.add('bg-success', 'text-white');
                     
                     setTimeout(() => {
@@ -220,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         btn.classList.remove('bg-success', 'text-white');
                     }, 1000);
 
+                    // Refresh isi modal keranjang agar barang yang baru langsung muncul tanpa reload halaman
                     fetch(window.location.href)
                         .then(res => res.text())
                         .then(html => {

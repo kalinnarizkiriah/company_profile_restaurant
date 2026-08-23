@@ -4,19 +4,12 @@
          <div class="col-lg-4">
             <div class="fnm">Resto<span>Jogja</span></div>
             <p class="fdesc">Kami menghadirkan cita rasa terbaik dunia secara bersamaan dalam pengalaman yang cepat, ramah, dan terjangkau. Setiap hidangan dibuat dengan cinta.</p>
-            <div class="fsoc">
-               <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-               <a href="#"><i class="fa-brands fa-instagram"></i></a>
-               <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-               <a href="#"><i class="fa-brands fa-youtube"></i></a>
-               <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-            </div>
          </div>
 
          <div class="col-sm-6 col-lg-2">
             <div class="ftit">Tautan Cepat</div>
             <ul class="flinks ps-0">
-               <li><a href="#hero"><i class="fa-solid fa-chevron-right"></i>Beranda</a></li>
+               <li><a href="#hero"><i class="fa-solid fa-chevron-right"></i>Rumah</a></li>
                <li><a href="#about"><i class="fa-solid fa-chevron-right"></i>Tentang</a></li>
                <li><a href="#menu"><i class="fa-solid fa-chevron-right"></i>Menu</a></li>
                <li><a href="#chefs"><i class="fa-solid fa-chevron-right"></i>Koki</a></li>

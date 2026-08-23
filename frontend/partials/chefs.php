@@ -52,8 +52,6 @@ if ($db) {
                             <img src="<?= htmlspecialchars($foto_koki); ?>" alt="<?= htmlspecialchars($row['name']); ?>"/>
                             <div class="chsoc">
                                 <a href="<?= $link_social; ?>" target="_blank"><i class="fab fa-instagram"></i></a>
-                                <a href="<?= $link_social; ?>" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                                <a href="<?= $link_social; ?>" target="_blank"><i class="fab fa-twitter"></i></a>
                             </div>
                         </div>
                         <div class="chbody">

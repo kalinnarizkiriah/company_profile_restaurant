@@ -1,4 +1,12 @@
 <?php 
+session_start();
+
+// Proteksi halaman login
+if (!isset($_SESSION['login_backend'])) {
+    header("Location: login.php");
+    exit;
+}
+
 include "connection.php"; 
 include "includes/header.php"; 
 ?>
@@ -55,7 +63,8 @@ include "includes/header.php";
                                             <td><span class="badge badge-info"><?= htmlspecialchars($profile->badge_text ?? ''); ?></span></td>
                                             <td>
                                                 <?php if(!empty($profile->gambar_hero)): ?>
-                                                    <img src="img/category/<?= htmlspecialchars($profile->gambar_hero); ?>" alt="Hero" style="width: 50px; height: 50px; object-fit: cover;" class="rounded border">                                                <?php else: ?>
+                                                    <img src="img/category/<?= htmlspecialchars($profile->gambar_hero); ?>" alt="Hero" style="width: 50px; height: 50px; object-fit: cover;" class="rounded border">
+                                                <?php else: ?>
                                                     <span class="text-muted">-</span>
                                                 <?php endif; ?>
                                             </td>

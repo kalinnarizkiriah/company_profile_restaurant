@@ -1,22 +1,30 @@
 <?php 
+session_start();
+
+// Proteksi agar halaman tidak bisa diakses jika belum login
+if (!isset($_SESSION['login_backend'])) {
+    header("Location: login.php");
+    exit;
+}
+
 include "connection.php"; 
 
 $message = "";
 $message_type = "";
 
-// 1. Proses Simpan / Update Data jika Form Dikitim (POST)
+// 1. Proses Simpan / Update Data jika Form Dikirim (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id                = $_POST['id'] ?? 1;
     $tahun_pengalaman  = mysqli_real_escape_string($connection, $_POST['tahun_pengalaman']);
     $judul_utama       = mysqli_real_escape_string($connection, $_POST['judul_utama']);
     $deskripsi_singkat = mysqli_real_escape_string($connection, $_POST['deskripsi_singkat']);
-    
+
     $poin_1_judul      = mysqli_real_escape_string($connection, $_POST['poin_1_judul']);
     $poin_1_desc       = mysqli_real_escape_string($connection, $_POST['poin_1_desc']);
-    
+
     $poin_2_judul      = mysqli_real_escape_string($connection, $_POST['poin_2_judul']);
     $poin_2_desc       = mysqli_real_escape_string($connection, $_POST['poin_2_desc']);
-    
+
     $poin_3_judul      = mysqli_real_escape_string($connection, $_POST['poin_3_judul']);
     $poin_3_desc       = mysqli_real_escape_string($connection, $_POST['poin_3_desc']);
 
@@ -48,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Cek apakah data sudah ada di database
     $check_query = mysqli_query($connection, "SELECT id FROM about WHERE id = '$id'");
-    
+
     if (mysqli_num_rows($check_query) > 0) {
         $sql = "UPDATE about SET 
                     tahun_pengalaman  = '$tahun_pengalaman',

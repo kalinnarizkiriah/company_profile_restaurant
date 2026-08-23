@@ -1,5 +1,5 @@
-<section id="contact-section" class="py-5">
-   <div class="container">
+<section id="contact-section" class="py-5" style="background-color: #FAF7F2; padding-top: 80px; padding-bottom: 140px; margin-bottom: 0;">
+<div class="container">
       <div class="text-center mb-5" data-aos="fade-up">
          <h2 class="stitle"><span>Hubungi</span> Kami</h2>
          <div class="sline"></div>
@@ -32,12 +32,7 @@
                   <div class="ctinfo"><strong>JAM BUKA</strong><span>Rabu – Minggu, 09.00 – 23.00 WIB</span></div>
                </div>
 
-               <div class="ctsocrow">
-                  <a href="#"><i class="fab fa-facebook-f"></i></a>
-                  <a href="#"><i class="fab fa-instagram"></i></a>
-                  <a href="#"><i class="fab fa-twitter"></i></a>
-                  <a href="#"><i class="fab fa-youtube"></i></a>
-               </div>
+              
             </div>
          </div>
 
@@ -67,7 +62,7 @@
                            <option value="" disabled selected>Pilih Topik Pesan</option>
                            <option value="Katering">Katering</option>
                            <option value="Katering & Acara">Katering &amp; Acara</option>
-                           <option value="Reservasi Tempat">Reservasi Tempat</option>
+                           <option value="Kerja Sama">Kerja Sama</option>
                            <option value="Pertanyaan Umum">Pertanyaan Umum</option>
                            <option value="Kritik & Masukan">Kritik &amp; Masukan</option>
                         </select>

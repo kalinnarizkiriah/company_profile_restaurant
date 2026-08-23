@@ -1,4 +1,12 @@
 <?php 
+session_start();
+
+// Proteksi halaman login
+if (!isset($_SESSION['login_backend'])) {
+    header("Location: login.php");
+    exit;
+}
+
 include "connection.php"; 
 include "includes/header.php"; 
 ?>
@@ -88,7 +96,7 @@ include "includes/header.php";
                                                         }
                                                     }
                                                 } 
-                                                // 2. Jika data berupa URL langsung (misal: https://instagram.com/...)
+                                                // 2. Jika data berupa URL langsung
                                                 elseif (filter_var($social, FILTER_VALIDATE_URL)) {
                                                     echo '<a href="' . htmlspecialchars($social) . '" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-external-link-alt me-1"></i> Buka Link</a>';
                                                 } 
@@ -113,7 +121,7 @@ include "includes/header.php";
                                         } else {
                                         ?>
                                         <tr>
-                                            <td colspan="7" class="text-center">Belum ada data chef.</td>
+                                            <td colspan="7" class="text-center py-4 text-muted">Belum ada data chef.</td>
                                         </tr>
                                         <?php } ?>
                                     </tbody>

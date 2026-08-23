@@ -1,4 +1,12 @@
 <?php 
+session_start();
+
+// Proteksi halaman login
+if (!isset($_SESSION['login_backend'])) {
+    header("Location: login.php");
+    exit;
+}
+
 include "connection.php"; 
 include "includes/header.php"; 
 ?>
@@ -119,7 +127,7 @@ include "includes/header.php";
                                         } else {
                                         ?>
                                         <tr>
-                                            <td colspan="8" class="text-center">Belum ada data menu.</td>
+                                            <td colspan="8" class="text-center py-4 text-muted">Belum ada data menu.</td>
                                         </tr>
                                         <?php } ?>
                                     </tbody>

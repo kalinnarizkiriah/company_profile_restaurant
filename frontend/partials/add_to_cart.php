@@ -1,11 +1,28 @@
 <?php
 session_start();
 
+// Set header response ke JSON
+header('Content-Type: application/json');
+
+// ============================================================
+// PROTEKSI LOGIN: Cek apakah customer sudah login atau belum
+// ============================================================
+if (!isset($_SESSION['login_customer'])) {
+    echo json_encode([
+        'status'  => 'unauthorized',
+        'message' => 'Silakan login terlebih dahulu untuk memesan menu!'
+    ]);
+    exit;
+}
+
+// ============================================================
+// PROSES TAMBAH KERANJANG
+// ============================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id    = $_POST['id'] ?? null;
-    $nama  = $_POST['nama'] ?? '';
+    $id        = $_POST['id'] ?? null;
+    $nama      = $_POST['nama'] ?? '';
     $harga_raw = $_POST['harga'] ?? 0;
-    $harga = (int) preg_replace('/[^0-9]/', '', $harga_raw);
+    $harga     = (int) preg_replace('/[^0-9]/', '', $harga_raw);
 
     if ($id) {
         if (!isset($_SESSION['cart'])) {
@@ -34,4 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-echo json_encode(['status' => 'error', 'message' => 'Gagal menambahkan menu']);
+echo json_encode([
+    'status'  => 'error', 
+    'message' => 'Gagal menambahkan menu'
+]);

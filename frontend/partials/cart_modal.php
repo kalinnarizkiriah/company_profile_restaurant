@@ -3,8 +3,8 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       
-      <!-- Header Modal -->
-      <div class="modal-header bg-danger text-white">
+      <!-- Header Modal (Menggunakan warna merah #e52e2e yang sama dengan icon/button) -->
+      <div class="modal-header text-white" style="background-color: #e52e2e !important;">
         <h5 class="modal-title fw-bold" id="modalKeranjangLabel">
           <i class="fa-solid fa-cart-shopping me-2"></i>Keranjang Belanja
         </h5>
@@ -97,9 +97,9 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Lanjut Belanja</button>
         <?php if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) : ?>
-            <a href="partials/checkout.php" class="btn btn-danger fw-bold">Checkout</a>
+            <a href="partials/checkout.php" class="btn btn-danger fw-bold" style="background-color: #e52e2e !important; border-color: #e52e2e !important;">Checkout</a>
         <?php else : ?>
-            <button type="button" class="btn btn-danger fw-bold" disabled>Checkout</button>
+<a href="partials/checkout.php" class="btn btn-danger px-4 fw-bold">Checkout</a>
         <?php endif; ?>
       </div>
 

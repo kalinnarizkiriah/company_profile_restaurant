@@ -8,6 +8,16 @@ include '../backend/connection.php';
 // PROSES AJAX KERANJANG LANGSUNG DI INDEX.PHP
 // ==========================================
 if (isset($_GET['ajax_cart_action'])) {
+    // Proteksi backend: Jika belum login, cegah aksi AJAX keranjang
+    if (!isset($_SESSION['login_customer'])) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status'  => 'error',
+            'message' => 'Silakan login terlebih dahulu!'
+        ]);
+        exit;
+    }
+
     header('Content-Type: application/json');
     $action = $_GET['ajax_cart_action'];
     $id     = isset($_GET['id']) ? $_GET['id'] : null;
@@ -61,6 +71,7 @@ $profile       = mysqli_fetch_assoc($query_profile);
 <!DOCTYPE html>
 <html lang="en">
    <head>
+    <link rel="icon" type="image/png" href="../backend/img/category/logojogja7.png">
       <meta charset="UTF-8">
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -89,9 +100,6 @@ $profile       = mysqli_fetch_assoc($query_profile);
 
     <!-- ini bagian navbar -->
     <?php include 'partials/navbar.php'; ?>
-
-    <!-- ini bagian search-overlay -->
-    <?php include 'partials/search-overlay.php'; ?>
 
     <!-- ini bagian hero -->
     <?php include 'partials/hero.php'; ?>
@@ -131,6 +139,27 @@ $profile       = mysqli_fetch_assoc($query_profile);
 <script src="js/main.js"></script>
 
 <script>
+// Status Login User dari PHP
+var isUserLoggedIn = <?php echo isset($_SESSION['login_customer']) ? 'true' : 'false'; ?>;
+
+// Cek dan cegah tombol pesan/keranjang jika user belum login
+document.addEventListener("DOMContentLoaded", function() {
+    if (!isUserLoggedIn) {
+        document.addEventListener('click', function(e) {
+            // Deteksi jika mengeklik tombol tambah keranjang atau link beli
+            var targetBtn = e.target.closest('a[href*="add_to_cart"], .btn-add-cart, [onclick*="cart"], [data-bs-target="#modalKeranjang"]');
+            
+            if (targetBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                alert("Silakan login terlebih dahulu untuk memesan menu!");
+                window.location.href = "partials/login_customer.php";
+            }
+        }, true);
+    }
+});
+
 // ==========================================
 // SISTEM FILTER KATEGORI MENU (VANILLA / HYBRID)
 // ==========================================

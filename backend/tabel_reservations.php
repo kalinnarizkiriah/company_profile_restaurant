@@ -1,8 +1,18 @@
 <?php 
+session_start();
+
+// Proteksi halaman login
+if (!isset($_SESSION['login_backend'])) {
+    header("Location: login.php");
+    exit;
+}
+
 include "connection.php"; 
-include "includes/header.php"; 
-// Ubah status semua reservasi baru menjadi sudah dibaca (1)
+
+// Mengubah status_dibaca menjadi 1 saat halaman reservasi dibuka
 mysqli_query($connection, "UPDATE reservations SET status_dibaca = 1 WHERE status_dibaca = 0");
+
+include "includes/header.php"; 
 ?>
 
 <body id="page-top">
@@ -71,8 +81,6 @@ mysqli_query($connection, "UPDATE reservations SET status_dibaca = 1 WHERE statu
                                             <td class="text-center"><?= htmlspecialchars($tampil->guests); ?></td>
                                             <td class="text-center"><?= htmlspecialchars($tampil->date); ?></td>
                                             <td class="text-center"><?= htmlspecialchars($tampil->time); ?></td>
-                                            
-                                               
                                             <td class="text-center text-nowrap">
                                                 <a href="delete_reservations.php?id=<?= $tampil->id; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus data reservasi ini?')">HAPUS</a>
                                             </td>
@@ -82,7 +90,7 @@ mysqli_query($connection, "UPDATE reservations SET status_dibaca = 1 WHERE statu
                                         } else {
                                         ?>
                                         <tr>
-                                            <td colspan="9" class="text-center">Belum ada data reservasi.</td>
+                                            <td colspan="8" class="text-center py-4 text-muted">Belum ada data reservasi.</td>
                                         </tr>
                                         <?php } ?>
                                     </tbody>

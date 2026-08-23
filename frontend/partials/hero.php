@@ -24,12 +24,14 @@ $nama_highlight = str_replace(
 <!-- ============================================================
      HERO (DINAMIS)
      ============================================================ -->
-<section id="hero">
+<!-- Mengatur padding atas agar jarak dari Navbar pas, dan padding bawah minim agar dekat ke bar merah -->
+<section id="hero" style="padding-top: 100px; padding-bottom: 20px;">
    <div class="hs hs1"></div>
    <div class="hs hs2"></div>
    <div class="hbgtxt">FOOD</div>
    <div class="container">
-      <div class="row align-items-center g-5" style="min-height:88vh;">
+      <!-- min-height dihapus, diganti padding biasa agar tidak ada ruang kosong mengambang -->
+      <div class="row align-items-center g-5">
          <div class="col-lg-6">
             <div class="hbadge">
                <div class="hbi"><i class="fas fa-star"></i></div>

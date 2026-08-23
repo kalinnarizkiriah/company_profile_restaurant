@@ -1,6 +1,14 @@
-<?php 
-include "connection.php"; 
-include "includes/header.php"; 
+<?php
+session_start();
+
+// Proteksi halaman: Jika belum login, tendang ke login.php
+if (!isset($_SESSION['login_backend'])) {
+    header("Location: login.php");
+    exit;
+}
+
+include "connection.php";
+include "includes/header.php";
 ?>
 
 <body id="page-top">
@@ -39,7 +47,7 @@ include "includes/header.php";
                             <!-- content start -->
                             <h5>Halo, Selamat Datang! 👋</h5>
                             <p class="mt-3">
-                                Silakan pilih menu pada <strong>sidebar sebelah kiri</strong> untuk mulai mengelola data restoran Anda (seperti Daftar Menu, Koki, dan tabel lainnya).
+                                Silakan pilih menu pada <strong>sidebar sebelah kiri</strong> untuk mulai mengelola data restoran Anda (seperti Daftar Profile, Menu, Koki, dan tabel lainnya).
                             </p>
                             <hr>
                             <a href="tabel_menu.php" class="btn btn-primary">

@@ -1,9 +1,18 @@
 <?php 
+session_start();
+
+// Proteksi halaman login
+if (!isset($_SESSION['login_backend'])) {
+    header("Location: login.php");
+    exit;
+}
+
 include "connection.php"; 
-include "includes/header.php"; 
+
 // Ubah status semua pesan menjadi sudah dibaca (1) saat admin membuka halaman ini
 mysqli_query($connection, "UPDATE contacts SET status_dibaca = 1 WHERE status_dibaca = 0");
-?>
+
+include "includes/header.php"; 
 ?>
 
 <body id="page-top">
@@ -41,18 +50,17 @@ mysqli_query($connection, "UPDATE contacts SET status_dibaca = 1 WHERE status_di
                         <div class="card-body">
                             <!-- content start -->
 
-
                             <div class="table-responsive">
                                 <table class="table table-striped table-bordered align-middle">
-                                    <thead>
+                                    <thead class="table-light">
                                         <tr>
-                                            <th scope="col" style="width: 50px;">No</th>
+                                            <th scope="col" class="text-center" style="width: 50px;">No</th>
                                             <th scope="col">Nama</th>
                                             <th scope="col">Email</th>
                                             <th scope="col">No. Telepon</th>
                                             <th scope="col">Subjek</th>
                                             <th scope="col">Pesan</th>
-                                            <th scope="col" style="width: 170px;">Aksi</th>
+                                            <th scope="col" class="text-center" style="width: 100px;">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -65,14 +73,14 @@ mysqli_query($connection, "UPDATE contacts SET status_dibaca = 1 WHERE status_di
                                             while ($tampil = mysqli_fetch_object($select_contacts)) :
                                         ?>
                                         <tr>
-                                            <td><?= $no++; ?></td>
-                                            <td><?= htmlspecialchars($tampil->name); ?></td>
+                                            <td class="text-center"><?= $no++; ?></td>
+                                            <td><strong><?= htmlspecialchars($tampil->name); ?></strong></td>
                                             <td><?= htmlspecialchars($tampil->email); ?></td>
                                             <td><?= htmlspecialchars($tampil->phone); ?></td>
-                                            <td><span class="badge badge-info"><?= htmlspecialchars($tampil->subject); ?></span></td>
+                                            <td><span class="badge bg-info text-white"><?= htmlspecialchars($tampil->subject); ?></span></td>
                                             <td><?= htmlspecialchars($tampil->message); ?></td>
-                                            <td>
-                                                <a href="delete_contacts.php?id=<?= $tampil->id; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus pesan ini?')">HAPUS</a>
+                                            <td class="text-center text-nowrap">
+                                                <a href="delete_contacts.php?id=<?= $tampil->id; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus pesan ini?')"><i class="fas fa-trash"></i> Hapus</a>
                                             </td>
                                         </tr>
                                         <?php 
@@ -80,7 +88,7 @@ mysqli_query($connection, "UPDATE contacts SET status_dibaca = 1 WHERE status_di
                                         else :
                                         ?>
                                         <tr>
-                                            <td colspan="7" class="text-center">Belum ada data pesan/kontak.</td>
+                                            <td colspan="7" class="text-center py-4 text-muted">Belum ada data pesan/kontak.</td>
                                         </tr>
                                         <?php endif; ?>
                                     </tbody>
