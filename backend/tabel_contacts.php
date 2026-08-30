@@ -57,7 +57,6 @@ include "includes/header.php";
                                             <th scope="col" class="text-center" style="width: 50px;">No</th>
                                             <th scope="col">Nama</th>
                                             <th scope="col">Email</th>
-                                            <th scope="col">No. Telepon</th>
                                             <th scope="col">Subjek</th>
                                             <th scope="col">Pesan</th>
                                             <th scope="col" class="text-center" style="width: 100px;">Aksi</th>
@@ -76,7 +75,6 @@ include "includes/header.php";
                                             <td class="text-center"><?= $no++; ?></td>
                                             <td><strong><?= htmlspecialchars($tampil->name); ?></strong></td>
                                             <td><?= htmlspecialchars($tampil->email); ?></td>
-                                            <td><?= htmlspecialchars($tampil->phone); ?></td>
                                             <td><span class="badge bg-info text-white"><?= htmlspecialchars($tampil->subject); ?></span></td>
                                             <td><?= htmlspecialchars($tampil->message); ?></td>
                                             <td class="text-center text-nowrap">
@@ -88,7 +86,7 @@ include "includes/header.php";
                                         else :
                                         ?>
                                         <tr>
-                                            <td colspan="7" class="text-center py-4 text-muted">Belum ada data pesan/kontak.</td>
+                                            <td colspan="6" class="text-center py-4 text-muted">Belum ada data pesan/kontak.</td>
                                         </tr>
                                         <?php endif; ?>
                                     </tbody>

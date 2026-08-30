@@ -46,10 +46,21 @@ if ($connection) {
                                 }
                                 ?>
                             </div>
-
+                            
                             <!-- Isi Ulasan -->
-                            <p class="testxt"><?= htmlspecialchars($row['ulasan'] ?? ''); ?></p>
+<p class="textxt"><?= htmlspecialchars($row['ulasan'] ?? ''); ?></p>
 
+<!-- Tambahkan Kode Balasan Admin di Sini -->
+<?php if (!empty($row['balasan'])) : ?>
+    <div class="mt-3 p-3 bg-light rounded border-start border-danger border-4 text-start">
+        <small class="fw-bold text-danger d-block mb-1">
+            <i class="fas fa-reply me-1"></i> Balasan dari Admin Resto:
+        </small>
+        <p class="mb-0 text-muted small">
+            <?= htmlspecialchars($row['balasan']); ?>
+        </p>
+    </div>
+<?php endif; ?>
                             <!-- Profil & Avatar Inisial Unik -->
                             <div class="tesauth">
                                 <img src="https://ui-avatars.com/api/?name=<?= urlencode($nama_pengulas); ?>&background=random&color=fff&size=128" 
@@ -72,17 +83,7 @@ if ($connection) {
             <div class="swiper-pagination mt-4" style="position:static;"></div>
         </div>
 
-        <!-- TOMBOL TAMBAH ULASAN -->
-        <div class="text-center mt-4" data-aos="fade-up">
-            <button type="button" 
-                    class="btn text-white fw-bold px-4 py-2" 
-                    data-bs-toggle="modal" 
-                    data-bs-target="#modalTambahUlasan"
-                    style="background-color: #d9230f; border: none; border-radius: 50px; box-shadow: 0 10px 20px rgba(217, 35, 15, 0.3);">
-                <i class="fas fa-plus-circle me-2"></i>Tambah Ulasan
-            </button>
-        </div>
-    </div>
+       
 </section>
 
 <!-- MODAL FORM ULASAN PELANGGAN -->
@@ -186,6 +187,36 @@ document.addEventListener("DOMContentLoaded", function () {
                 window.location.reload();
             });
         });
+    }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Cek apakah ada parameter no_pesanan di URL (dari halaman riwayat pesanan)
+    const urlParams = new URLSearchParams(window.location.search);
+    const noPesanan = urlParams.get('no_pesanan');
+
+    if (noPesanan) {
+        // Otomatis buka modal ulasan pakai Bootstrap 5
+        const modalElement = document.getElementById('modalTambahUlasan');
+        if (modalElement) {
+            const myModal = new bootstrap.Modal(modalElement);
+            myModal.show();
+            
+            // Opsional: Jika Anda ingin menyimpan nomor pesanan ke dalam form (misal input hidden)
+            // agar tersimpan ke database bahwa pesanan itu sudah diulas
+            let inputHidden = modalElement.querySelector('input[name="no_pesanan"]');
+            if (!inputHidden && formUlasanPelanggan) {
+                inputHidden = document.createElement('input');
+                inputHidden.type = 'hidden';
+                inputHidden.name = 'no_pesanan';
+                formUlasanPelanggan.appendChild(inputHidden);
+            }
+            if (inputHidden) {
+                inputHidden.value = noPesanan;
+            }
+        }
     }
 });
 </script>

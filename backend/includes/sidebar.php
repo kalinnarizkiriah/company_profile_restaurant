@@ -131,18 +131,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </a>
     </li>
 
-    <li class="nav-item <?= ($current_page == 'tabel_login.php') ? 'active' : ''; ?>">
-        <a class="nav-link text-white d-flex align-items-center justify-content-between" href="tabel_login.php">
-            <div>
-                <i class="fas fa-users me-2"></i>
-                <span>Kelola Akun</span>
-            </div>
-            <span id="badge-akun-baru" class="badge bg-danger rounded-pill px-2 py-1" style="display: none; font-size: 11px;">0</span>
-        </a>
-    </li>
+    <?php if (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] === 'super_admin') : ?>
+<li class="nav-item <?= ($current_page == 'tabel_login.php') ? 'active' : ''; ?>">
+    <a class="nav-link text-white d-flex align-items-center justify-content-between" href="tabel_login.php">
+        <div>
+            <i class="fas fa-users me-2"></i>
+            <span>Kelola Akun</span>
+        </div>
+        <span id="badge-akun-baru" class="badge bg-danger rounded-pill px-2 py-1" style="display: none;"></span>
+    </a>
+</li>
+<?php endif; ?>
 
     <!-- Menu Pesanan di Sidebar -->
-    <li class="nav-item <?= ($current_page == 'pesanan.php') ? 'active' : ''; ?>">
+  <li class="nav-item <?= ($current_page == 'pesanan.php') ? 'active' : ''; ?>">
         <a class="nav-link d-flex align-items-center justify-content-between" href="pesanan.php">
             <div>
                 <i class="fas fa-fw fa-shopping-cart me-2"></i>
@@ -158,60 +160,29 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <hr class="sidebar-divider d-none d-md-block">
 
 </ul>
-
 <script>
-function checkNotifUserBaru() {
-    fetch('check_new_users.php?t=' + new Date().getTime())
+function updateBadgePesanan() {
+    // Sesuaikan path ../backend/ jika file sidebar berada di luar folder backend
+    fetch('../backend/cek_pesanan_baru.php?t=' + new Date().getTime())
         .then(response => response.json())
         .then(data => {
-            if (data.status === 'success') {
-                const badge = document.getElementById('badge-akun-baru');
-                if (badge) {
-                    if (data.total > 0) {
-                        badge.textContent = data.total;
-                        badge.style.display = 'inline-block';
-                    } else {
-                        badge.style.display = 'none';
-                    }
+            const badge = document.getElementById('badge-pesanan-baru');
+            if (badge) {
+                // Sesuai dengan output PHP: echo json_encode(['total' => ...])
+                if (data.total > 0) {
+                    badge.textContent = data.total;
+                    badge.style.display = 'inline-block'; // Munculkan badge
+                } else {
+                    badge.style.display = 'none'; // Sembunyikan jika 0
                 }
             }
         })
-        .catch(error => console.log('Error User Check:', error));
+        .catch(error => console.log('Gagal ambil data pesanan:', error));
 }
 
-function checkNotifPesananBaru() {
-    // Tambah parameter waktu (?t=...) agar browser tidak mengambil data lama (cache)
-    fetch('check_new_pesanan.php?t=' + new Date().getTime())
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('HTTP error! status: ' + response.status);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.status === 'success') {
-                const badgePesanan = document.getElementById('badge-pesanan-baru');
-                if (badgePesanan) {
-                    if (data.total > 0) {
-                        badgePesanan.textContent = data.total;
-                        badgePesanan.style.display = 'inline-block';
-                    } else {
-                        badgePesanan.style.display = 'none';
-                    }
-                }
-            }
-        })
-        .catch(error => console.log('Error Pesanan Check:', error));
-}
-
+// Jalankan otomatis saat halaman dimuat dan ulang setiap 2 detik
 document.addEventListener('DOMContentLoaded', function() {
-    checkNotifUserBaru();
-    checkNotifPesananBaru();
-    
-    // Interval setiap 2 detik
-    setInterval(function() {
-        checkNotifUserBaru();
-        checkNotifPesananBaru();
-    }, 2000);
+    updateBadgePesanan();
+    setInterval(updateBadgePesanan, 2000);
 });
 </script>

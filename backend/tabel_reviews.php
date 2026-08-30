@@ -45,7 +45,7 @@ include "includes/header.php";
                     <!-- Card Tabel Reviews -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Daftar Ulasan Pelanggan</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Daftar Ulasan Pelanggan & Balasan Admin</h6>
                         </div>
                         <div class="card-body">
                             <!-- content start -->
@@ -55,10 +55,11 @@ include "includes/header.php";
                                     <thead class="table-light">
                                         <tr>
                                             <th scope="col" class="text-center" style="width: 50px;">No</th>
-                                            <th scope="col" style="width: 200px;">Nama</th>
-                                            <th scope="col" class="text-center" style="width: 120px;">Bintang</th>
-                                            <th scope="col">Ulasan</th>
-                                            <th scope="col" class="text-center" style="width: 100px;">Aksi</th>
+                                            <th scope="col" style="width: 150px;">Nama</th>
+                                            <th scope="col" class="text-center" style="width: 100px;">Bintang</th>
+                                            <th scope="col" style="width: 30%;">Ulasan Pelanggan</th>
+                                            <th scope="col" style="width: 30%;">Balasan Admin</th>
+                                            <th scope="col" class="text-center" style="width: 140px;">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -79,8 +80,23 @@ include "includes/header.php";
                                                 </span>
                                             </td>
                                             <td><?= htmlspecialchars($tampil->ulasan); ?></td>
+                                            <td>
+                                                <?php if (!empty($tampil->balasan)) : ?>
+                                                    <div class="p-2 bg-light rounded border text-secondary small">
+                                                        <i class="fas fa-reply text-primary me-1"></i> <?= htmlspecialchars($tampil->balasan); ?>
+                                                    </div>
+                                                <?php else : ?>
+                                                    <span class="text-muted small fst-italic">Belum dibalas</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td class="text-center text-nowrap">
-                                                <a href="delete_reviews.php?id=<?= $tampil->id; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus ulasan ini?')"><i class="fas fa-trash"></i> Hapus</a>
+                                                <!-- Tombol diarahkan ke form balas tersendiri agar pasti bisa diklik -->
+                                                <a href="form_balas_reviews.php?id=<?= $tampil->id; ?>" class="btn btn-sm btn-primary mb-1">
+                                                    <i class="fas fa-reply"></i> Balas
+                                                </a>
+                                                <a href="delete_reviews.php?id=<?= $tampil->id; ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Yakin ingin menghapus ulasan ini?')">
+                                                    <i class="fas fa-trash"></i> Hapus
+                                                </a>
                                             </td>
                                         </tr>
                                         <?php 
@@ -88,7 +104,7 @@ include "includes/header.php";
                                         else :
                                         ?>
                                         <tr>
-                                            <td colspan="5" class="text-center py-4 text-muted">Belum ada data ulasan.</td>
+                                            <td colspan="6" class="text-center py-4 text-muted">Belum ada data ulasan.</td>
                                         </tr>
                                         <?php endif; ?>
                                     </tbody>

@@ -8,7 +8,22 @@ if (!isset($connection)) {
     }
 }
 
-// 1. Ambil Semua Kategori Unik dari Database Backend untuk Tombol Filter
+// 1. Ambil Teks Promo dari tabel profile (Opsional jika masih dibutuhkan bagian lain)
+$persen_diskon = 0; 
+$promo_query = mysqli_query($connection, "SELECT * FROM tb_profile LIMIT 1"); 
+if ($promo_query && $row_promo = mysqli_fetch_assoc($promo_query)) {
+    $teks_promo = $row_promo['teks_promo'] ?? '';
+    if (preg_match('/(\d+)\s*%/', $teks_promo, $matches)) {
+        $persen_diskon = intval($matches[1]);
+    }
+}
+
+// Fallback Cadangan: Jika database kosong atau tidak ada format %, paksa jadi 5%
+if ($persen_diskon <= 0) {
+    $persen_diskon = 5; 
+}
+
+// 2. Ambil Semua Kategori Unik dari Database Backend untuk Tombol Filter
 $kategori_query = mysqli_query($connection, "SELECT DISTINCT kategori FROM menu WHERE kategori IS NOT NULL AND kategori != ''");
 $kategoris = [];
 if ($kategori_query) {
@@ -47,7 +62,7 @@ function make_slug($text) {
       <!-- GRID MENU ITEM -->
       <div class="row g-4" id="mgrid">
          <?php
-         // 2. Query Ambil Data Menu dari Database
+         // 3. Query Ambil Data Menu dari Database
          $menu_query = mysqli_query($connection, "SELECT * FROM menu ORDER BY id ASC");
          $delay = 0;
 
@@ -69,25 +84,41 @@ function make_slug($text) {
                      $path_gambar = "../backend/img/category/burgers.jpg";
                  }
                  
+                 // ==========================================
+                 // PERUBAHAN KHUSUS BAGIAN DISKON (MEMBACA KOLOM DATABASE)
+                 // ==========================================
                  $raw_price = $row->price ?? '0';
+                 $raw_diskon = $row->harga_diskon ?? null; // Ambil langsung dari kolom harga_diskon tabel menu
+
+                 // Tentukan harga aktif untuk keranjang (prioritaskan harga diskon jika ada isinya & > 0)
+                 $active_price = (!empty($raw_diskon) && $raw_diskon > 0) ? $raw_diskon : $raw_price;
+
+                 // Format Rupiah Harga Asli
                  if (is_numeric($raw_price)) {
                      $formatted_price = "Rp " . number_format($raw_price, 0, ',', '.');
                  } else {
                      $formatted_price = (strpos($raw_price, 'Rp') === false) ? "Rp " . $raw_price : $raw_price;
                  }
 
+                 // Format Rupiah Harga Diskon
+                 $formatted_diskon = "";
+                 if (!empty($raw_diskon) && $raw_diskon > 0 && is_numeric($raw_diskon)) {
+                     $formatted_diskon = "Rp " . number_format($raw_diskon, 0, ',', '.');
+                 }
+                 // ==========================================
+
                  $delay_attr = ($delay > 0) ? 'data-aos-delay="' . $delay . '"' : '';
                  $delay = ($delay >= 160) ? 0 : $delay + 80;
          ?>
          
-         <!-- ITEM CARD (Ditambahkan data-category presisi) -->
+         <!-- ITEM CARD -->
          <div class="col-sm-6 col-lg-4 mwrap menu-item" data-c="<?= $cat_slug; ?>" data-category="<?= $cat_slug; ?>" data-aos="fade-up" <?= $delay_attr; ?>>
             <div class="mcard"
                data-img="<?= $path_gambar; ?>"
                data-title="<?= htmlspecialchars($row->title ?? ''); ?>"
                data-cat="<?= htmlspecialchars($kat_name); ?>"
-               data-price="<?= $formatted_price; ?>" 
-               data-old=""
+               data-price="<?= (!empty($raw_diskon) && $raw_diskon > 0) ? $formatted_diskon : $formatted_price; ?>" 
+               data-old="<?= (!empty($raw_diskon) && $raw_diskon > 0) ? $formatted_price : ''; ?>"
                data-rating="<?= htmlspecialchars($row->rating ?? '5.0'); ?>" 
                data-reviews="50"
                data-cal="450" 
@@ -106,20 +137,33 @@ function make_slug($text) {
                   <div class="mdesc"><?= htmlspecialchars($row->deskripsi ?? ''); ?></div>
                   <div class="mfoot">
                      <div>
-                        <div class="mprice"><?= $formatted_price; ?></div>
+                        <!-- TAMPILAN HARGA & DISKON BERDASARKAN DATABASE -->
+                        <?php if (!empty($raw_diskon) && $raw_diskon > 0) : ?>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-danger fw-bold" style="font-size: 1rem;">
+                                    <?= $formatted_diskon; ?>
+                                </span>
+                                <span class="text-muted text-decoration-line-through small" style="font-size: 0.8rem;">
+                                    <?= $formatted_price; ?>
+                                </span>
+                            </div>
+                        <?php else : ?>
+                            <div class="mprice"><?= $formatted_price; ?></div>
+                        <?php endif; ?>
+
                         <div class="mstars">
                            <i class="fa-solid fa-star"></i> <span style="color:#bbb;font-size:.7rem;">(<?= htmlspecialchars($row->rating ?? '5.0'); ?>)</span>
                         </div>
                      </div>
                      <!-- TOMBOL TAMBAH KE KERANJANG -->
                      <button class="madd btn-add-cart" 
-                             type="button" 
-                             title="Tambah ke Keranjang"
-                             style="position: relative; z-index: 10; cursor: pointer;"
-                             data-id="<?= $row->id; ?>"
-                             data-nama="<?= htmlspecialchars($row->title ?? ''); ?>"
-                             data-harga="<?= $raw_price; ?>"
-                             data-gambar="<?= $path_gambar; ?>">
+                            type="button" 
+                            title="Tambah ke Keranjang"
+                            style="position: relative; z-index: 10; cursor: pointer;"
+                            data-id="<?= $row->id; ?>"
+                            data-nama="<?= htmlspecialchars($row->title ?? ''); ?>"
+                            data-harga="<?= $active_price; ?>"
+                            data-gambar="<?= $path_gambar; ?>">
                         <i class="fa-solid fa-plus"></i>
                      </button>
                   </div>
@@ -138,35 +182,25 @@ function make_slug($text) {
          <?php endif; ?>
 
       </div>
-      <!-- end #mgrid -->
-
    </div>
 </section>
 
-<!-- SCRIPT LOGIKA FILTER PRESISI & KERANJANG -->
+<!-- SCRIPT LOGIKA FILTER & KERANJANG -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // ==========================================
-    // LOGIKA FILTER KATEGORI PRESISI (EXACT MATCH)
-    // ==========================================
     const filterButtons = document.querySelectorAll('.filter-controls .filtbtn');
     const menuWrappers = document.querySelectorAll('#mgrid .mwrap');
 
     filterButtons.forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            
-            // Ubah Status Aktif Tombol
             filterButtons.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
 
             const targetCategory = this.getAttribute('data-f');
 
-            // Filter Setiap Card Secara Persis
             menuWrappers.forEach(function(item) {
                 const itemCategory = item.getAttribute('data-c');
-
                 if (targetCategory === 'all' || itemCategory === targetCategory) {
                     item.style.display = '';
                     item.classList.remove('d-none');
@@ -178,9 +212,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ==========================================
-    // SCRIPT PENANGAN KLIK KERANJANG
-    // ==========================================
     document.querySelectorAll('.btn-add-cart').forEach(function(button) {
         button.addEventListener('click', function(e) {
             e.preventDefault(); 
@@ -205,13 +236,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Update badge keranjang di navbar/header
                     const cartBadges = document.querySelectorAll('[data-bs-target="#modalKeranjang"] .badge, .cart-badge');
                     cartBadges.forEach(badge => {
                         badge.textContent = data.total_items;
                     });
 
-                    // Efek tombol berubah hijau centang sementara
                     const originalHTML = btn.innerHTML;
                     btn.innerHTML = '<i class="fa-solid fa-check"></i>';
                     btn.classList.add('bg-success', 'text-white');
@@ -221,7 +250,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         btn.classList.remove('bg-success', 'text-white');
                     }, 1000);
 
-                    // Refresh isi modal keranjang agar barang yang baru langsung muncul tanpa reload halaman
                     fetch(window.location.href)
                         .then(res => res.text())
                         .then(html => {
@@ -236,9 +264,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     alert('Gagal menambahkan menu.');
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
             });
         });
     });

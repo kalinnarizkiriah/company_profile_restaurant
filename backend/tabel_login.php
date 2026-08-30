@@ -5,7 +5,7 @@ session_start();
 include "connection.php";
 
 // 2. Tandai semua akun customer baru sebagai "sudah dibaca"
-mysqli_query($connection, "UPDATE tabel_login SET is_read = 1 WHERE role = 'Customer' AND is_read = 0");
+mysqli_query($connection, "UPDATE tabel_login SET is_read = 1 WHERE role = 'customer' AND is_read = 0");
 
 // 3. Cek session login admin
 if (!isset($_SESSION['login_backend'])) {
@@ -58,7 +58,13 @@ include "includes/header.php";
                                     <tbody>
                                         <?php
                                         $no = 1;
-                                        $query = mysqli_query($connection, "SELECT * FROM tabel_login ORDER BY id DESC");
+                                        // Mengurutkan posisi: Super Admin (1), Admin (2), lalu Customer (3)
+                                        $query = mysqli_query($connection, "SELECT * FROM tabel_login ORDER BY 
+                                            CASE 
+                                                WHEN role = 'super_admin' THEN 1
+                                                WHEN role = 'admin' THEN 2
+                                                ELSE 3
+                                            END ASC, id DESC");
                                         
                                         if ($query && mysqli_num_rows($query) > 0) :
                                             while ($data = mysqli_fetch_object($query)) :
@@ -69,14 +75,20 @@ include "includes/header.php";
                                             <td><?= htmlspecialchars($data->username); ?></td>
                                             <td><code><?= htmlspecialchars($data->password); ?></code></td>
                                             <td class="text-center">
-                                                <?php if (strtolower($data->role ?? '') == 'admin') : ?>
-                                                    <span class="badge bg-danger text-white px-2 py-1">Admin</span>
+                                                <?php if (strtolower($data->role ?? '') == 'super_admin') : ?>
+                                                    <span class="badge bg-danger text-white px-2 py-1">Super Admin</span>
+                                                <?php elseif (strtolower($data->role ?? '') == 'admin') : ?>
+                                                    <span class="badge bg-primary text-white px-2 py-1">Admin</span>
                                                 <?php else : ?>
                                                     <span class="badge bg-info text-white px-2 py-1">Customer</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center text-nowrap">
-                                                <a href="delete_login.php?id=<?= $data->id; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus akun ini?')">HAPUS</a>
+                                                <?php if (strtolower($data->role ?? '') !== 'super_admin') : ?>
+                                                    <a href="delete_login.php?id=<?= $data->id; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus akun ini?')">HAPUS</a>
+                                                <?php else : ?>
+                                                    <span class="text-muted small fst-italic">Utama (Protected)</span>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                         <?php 

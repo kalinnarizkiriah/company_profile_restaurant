@@ -24,7 +24,7 @@ foreach ($_SESSION['cart'] as $item) {
     <!-- Judul Tab disamakan dengan Dashboard -->
     <title>Restoran Jogja Istimewa</title>
     
-    <!-- Favicon Logo (Path dinaikkan 2 level) -->
+    <!-- Favicon Logo -->
     <link rel="icon" type="image/png" href="../../backend/img/category/logojogja7.png">
     
     <!-- Bootstrap 5 CSS -->
@@ -59,7 +59,6 @@ foreach ($_SESSION['cart'] as $item) {
         }
         .qris-box { border: 2px dashed var(--primary-color); border-radius: 12px; background: #fff; padding: 20px; }
         
-        /* Kustomisasi warna kustom oren kemerahan */
         .text-custom-primary { color: var(--primary-color) !important; }
         .btn-custom-primary {
             background-color: var(--primary-color) !important;
@@ -102,18 +101,46 @@ foreach ($_SESSION['cart'] as $item) {
                         <i class="fa-solid fa-user me-2 text-custom-primary"></i>Informasi Pemesan
                     </div>
                     <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label fw-medium">Nama Lengkap</label>
-                            <input type="text" id="nama" class="form-control" required>
+                         <div class="mb-3">
+                            <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
+                            <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" value="<?php echo isset($_SESSION['customer_nama_lengkap']) ? $_SESSION['customer_nama_lengkap'] : ''; ?>" readonly>
                         </div>
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-medium">Nomor WhatsApp / HP</label>
-                                <input type="tel" id="nohp" class="form-control" required>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-medium">No. Telp / WhatsApp *</label>
+                                <!-- Validasi diperketat khusus operator Indonesia -->
+                                <input type="tel" id="nohp" class="form-control" maxlength="15" required>
+                                <div id="errorNohp" class="text-danger small mt-1" style="display: none;"></div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-medium">Nomor Meja / Catatan</label>
-                                <input type="text" id="catatan" class="form-control">
+                            
+                            <!-- Dropdown Pilihan Meja dengan Area Lengkap -->
+                            <div class="col-md-4 mb-3" id="containerNoMeja">
+                                <label class="form-label fw-medium">Nomor Meja *</label>
+                                <select id="no_meja" class="form-select" required>
+                                    <option value="" disabled selected>Pilih Meja Restoran</option>
+                                    
+                                    <optgroup label="--- Area Indoor ---">
+                                        <option value="Meja Indoor 01 — Kapasitas 2 Orang">Meja Indoor 01 — Kapasitas 2 Orang</option>
+                                        <option value="Meja Indoor 02 — Kapasitas 2 Orang">Meja Indoor 02 — Kapasitas 2 Orang</option>
+                                        <option value="Meja Indoor 03 — Kapasitas 4 Orang">Meja Indoor 03 — Kapasitas 4 Orang</option>
+                                        <option value="Meja Indoor 04 — Kapasitas 4 Orang">Meja Indoor 04 — Kapasitas 4 Orang</option>
+                                        <option value="Meja Indoor 05 — Kapasitas 6 Orang (Keluarga)">Meja Indoor 05 — Kapasitas 6 Orang (Keluarga)</option>
+                                        <option value="Meja VIP 01 (Indoor - Private AC) — Kapasitas 8-10 Orang">Meja VIP 01 (Indoor - Private AC) — Kapasitas 8-10 Orang</option>
+                                        <option value="Meja VIP 02 (Indoor - Private AC) — Kapasitas 10-12 Orang">Meja VIP 02 (Indoor - Private AC) — Kapasitas 10-12 Orang</option>
+                                    </optgroup>
+
+                                    <optgroup label="--- Area Outdoor ---">
+                                        <option value="Meja Outdoor 01 — Kapasitas 2 Orang">Meja Outdoor 01 — Kapasitas 2 Orang</option>
+                                        <option value="Meja Outdoor 02 — Kapasitas 2 Orang">Meja Outdoor 02 — Kapasitas 2 Orang</option>
+                                        <option value="Meja Outdoor 03 — Kapasitas 4 Orang">Meja Outdoor 03 — Kapasitas 4 Orang</option>
+                                        <option value="Meja Outdoor 04 — Kapasitas 4 Orang">Meja Outdoor 04 — Kapasitas 4 Orang</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-3" id="containerCatatan">
+                                <label class="form-label fw-medium">Catatan</label>
+                                <input type="text" id="catatan" class="form-control" placeholder="Opsional">
                             </div>
                         </div>
                     </div>
@@ -237,7 +264,7 @@ foreach ($_SESSION['cart'] as $item) {
         </div>
 
         <!-- Judul Dinamis -->
-        <h4 id="statusTitle" class="fw-bold mb-1">Menunggu Pembayaran</h4>
+        <h4 id="statusTitle" class="fw-bold mb-1">Menunggu Konfirmasi Admin...</h4>
         <p class="text-muted small mb-3">Nomor Pesanan: <strong id="resNoPesanan" class="text-custom-primary"></strong></p>
 
         <!-- Informasi Ringkasan -->
@@ -245,6 +272,10 @@ foreach ($_SESSION['cart'] as $item) {
             <div class="d-flex justify-content-between mb-1">
                 <span class="text-muted small">Nama Pemesan:</span>
                 <span id="resNama" class="fw-bold small"></span>
+            </div>
+            <div class="d-flex justify-content-between mb-1" id="modalRowMeja">
+                <span class="text-muted small">Nomor Meja:</span>
+                <span id="resNoMeja" class="fw-bold small"></span>
             </div>
             <div class="d-flex justify-content-between mb-1">
                 <span class="text-muted small">Tipe Pesanan:</span>
@@ -272,13 +303,6 @@ foreach ($_SESSION['cart'] as $item) {
                         <i class="fa-solid fa-download me-1"></i> Unduh Gambar QRIS
                     </a>
                 </div>
-            </div>
-
-            <!-- Tombol Konfirmasi QRIS -->
-            <div id="btnKonfirmasiQRIS" class="d-grid gap-2">
-                <button type="button" id="btnSudahBayar" class="btn btn-success py-2 fw-bold">
-                    <i class="fa-solid fa-circle-check me-2"></i>Saya Sudah Bayar
-                </button>
             </div>
         </div>
 
@@ -311,23 +335,75 @@ foreach ($_SESSION['cart'] as $item) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const radioDineIn = document.getElementById('tipe_dinein');
+    const radioTakeaway = document.getElementById('tipe_takeaway');
+    const containerNoMeja = document.getElementById('containerNoMeja');
+    const inputNoMeja = document.getElementById('no_meja');
+
+    function aturTampilanMeja() {
+        if (radioTakeaway.checked) {
+            containerNoMeja.style.display = 'none';
+            inputNoMeja.value = '';
+            inputNoMeja.removeAttribute('required');
+        } else {
+            containerNoMeja.style.display = 'block';
+            inputNoMeja.setAttribute('required', 'true');
+        }
+    }
+
+    aturTampilanMeja();
+    radioDineIn.addEventListener('change', aturTampilanMeja);
+    radioTakeaway.addEventListener('change', aturTampilanMeja);
+
+    // Validasi input Nomor HP secara langsung (mengizinkan + di awal dan angka di selebihnya)
+    const inputNohp = document.getElementById('nohp');
+    const errorNohp = document.getElementById('errorNohp');
+
+    inputNohp.addEventListener('input', function() {
+        let val = this.value;
+        if (val.startsWith('+')) {
+            this.value = '+' + val.substring(1).replace(/[^0-9]/g, '');
+        } else {
+            this.value = val.replace(/[^0-9]/g, '');
+        }
+    });
+});
+
 let globalDataPesanan = {};
+let intervalCekStatus = null;
 
 document.getElementById('formCheckout').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    const nama = document.getElementById('nama').value;
     const nohp = document.getElementById('nohp').value;
-    const catatan = document.getElementById('catatan').value;
+    const errorNohp = document.getElementById('errorNohp');
+
+    // Validasi diperketat: Menggunakan prefix operator seluler resmi Indonesia yang valid (Telkomsel, Indosat, XL, Tri, Smartfren, Axis)
+    const polaNohp = /^(\+62|62|08)(11|12|13|21|22|23|52|53|51|14|15|16|55|56|57|58|17|18|19|59|77|78|95|96|97|98|99|81|82|83|84|85|86|87|88|89|31|32|33|38)[0-9]{7,9}$/;
+
+    if (!polaNohp.test(nohp)) {
+        errorNohp.style.display = 'block';
+        errorNohp.innerText = 'Nomor HP tidak valid! Masukkan nomor operator seluler Indonesia yang aktif dan benar.';
+        document.getElementById('nohp').focus();
+        return; // Hentikan proses jika nomor HP salah/palsu
+    } else {
+        errorNohp.style.display = 'none';
+    }
+
+    const nama = document.getElementById('nama_lengkap').value;
     const tipe = document.querySelector('input[name="tipe"]:checked').value;
+    const noMeja = (tipe === 'Dibungkus') ? '-' : document.getElementById('no_meja').value;
+    const catatan = document.getElementById('catatan').value;
     const metode = document.querySelector('input[name="metode"]:checked').value;
     const grandTotal = "Rp <?= number_format($grand_total, 0, ',', '.'); ?>";
     const noPesanan = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
-
+    
     globalDataPesanan = {
         no_pesanan: noPesanan,
         nama: nama,
         nohp: nohp,
+        no_meja: noMeja,
         catatan: catatan,
         tipe: tipe,
         metode: metode
@@ -338,40 +414,34 @@ document.getElementById('formCheckout').addEventListener('submit', function(e) {
     document.getElementById('resTipe').innerText = tipe;
     document.getElementById('resTotal').innerText = grandTotal;
 
+    if (tipe === 'Dibungkus') {
+        document.getElementById('modalRowMeja').style.display = 'none';
+    } else {
+        document.getElementById('modalRowMeja').style.display = 'flex';
+        document.getElementById('resNoMeja').innerText = noMeja;
+    }
+
+    simpanPesananKeDatabase(globalDataPesanan);
+
+    // Tampilan Awal: Menunggu Konfirmasi
+    document.getElementById('statusIcon').className = 'fa-solid fa-clock text-warning fs-1';
+    document.getElementById('statusTitle').innerText = 'Menunggu Konfirmasi Admin...';
+    
     if (metode === 'QRIS') {
-        document.getElementById('statusIcon').className = 'fa-solid fa-clock text-warning fs-1';
-        document.getElementById('statusTitle').innerText = 'Menunggu Pembayaran...';
-        
         document.getElementById('tampilanQRIS').classList.remove('d-none');
         document.getElementById('tampilanKasir').classList.add('d-none');
-        
-        document.getElementById('btnKonfirmasiQRIS').classList.remove('d-none');
-        document.getElementById('btnSelesai').classList.add('d-none');
     } else {
-        simpanPesananKeDatabase(globalDataPesanan);
-
-        document.getElementById('statusIcon').className = 'fa-solid fa-circle-check text-success fs-1';
-        document.getElementById('statusTitle').innerText = 'Pesanan Berhasil Dibuat!';
-        
         document.getElementById('tampilanKasir').classList.remove('d-none');
         document.getElementById('tampilanQRIS').classList.add('d-none');
         document.getElementById('resNoPesananKasir').innerText = noPesanan;
-        
-        document.getElementById('btnSelesai').classList.remove('d-none');
     }
+    
+    document.getElementById('btnSelesai').classList.add('d-none');
 
     const modalPembayaran = new bootstrap.Modal(document.getElementById('modalPembayaran'));
     modalPembayaran.show();
-});
 
-document.getElementById('btnSudahBayar').addEventListener('click', function() {
-    simpanPesananKeDatabase(globalDataPesanan);
-
-    document.getElementById('statusIcon').className = 'fa-solid fa-circle-check text-success fs-1';
-    document.getElementById('statusTitle').innerText = 'Pesanan Berhasil Dibuat!';
-    
-    document.getElementById('btnKonfirmasiQRIS').classList.add('d-none');
-    document.getElementById('btnSelesai').classList.remove('d-none');
+    mulaiCekStatusPesanan(noPesanan);
 });
 
 function simpanPesananKeDatabase(dataPesanan) {
@@ -382,14 +452,61 @@ function simpanPesananKeDatabase(dataPesanan) {
     })
     .then(response => response.json())
     .then(data => {
-        if(data.status !== 'success') {
-            alert('Gagal menyimpan pesanan: ' + data.message);
+        if(data.status === 'success') {
+            const badgeKeranjang = document.querySelector('nav .position-absolute, .badge');
+            if (badgeKeranjang) {
+                badgeKeranjang.innerText = '0';
+            }
+        } else {
+            console.warn('Peringatan penyimpanan:', data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
     });
 }
+
+function mulaiCekStatusPesanan(noPesanan) {
+    if (intervalCekStatus) clearInterval(intervalCekStatus);
+
+    intervalCekStatus = setInterval(() => {
+        fetch(`cek_status_pesanan.php?no_pesanan=${noPesanan}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success' && data.status_pesanan) {
+                const status = data.status_pesanan.trim();
+                const statusTitle = document.getElementById('statusTitle');
+                const statusIcon = document.getElementById('statusIcon');
+
+                if (status === 'Pembayaran Berhasil') {
+                    statusTitle.innerText = 'Pembayaran Berhasil!';
+                    statusIcon.className = 'fa-solid fa-circle-check text-success fs-1';
+                    document.getElementById('tampilanQRIS').classList.add('d-none');
+                    document.getElementById('tampilanKasir').classList.add('d-none');
+                } 
+                else if (status === 'Diproses') {
+                    statusTitle.innerText = 'Pesanan Sedang Diproses...';
+                    statusIcon.className = 'fa-solid fa-spinner fa-spin text-info fs-1';
+                    document.getElementById('tampilanQRIS').classList.add('d-none');
+                    document.getElementById('tampilanKasir').classList.add('d-none');
+                } 
+                else if (status === 'Selesai') {
+                    clearInterval(intervalCekStatus);
+                    statusTitle.innerText = 'Pesanan Selesai!';
+                    statusIcon.className = 'fa-solid fa-circle-check text-success fs-1';
+                    
+                    document.getElementById('tampilanQRIS').classList.add('d-none');
+                    document.getElementById('tampilanKasir').classList.add('d-none');
+                    document.getElementById('btnSelesai').classList.remove('d-none');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error cek status:', error);
+        });
+    }, 3000); 
+}
 </script>
+
 </body>
 </html>

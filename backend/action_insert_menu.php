@@ -3,11 +3,13 @@ include "connection.php";
 
 if (isset($_POST['submit'])) {
 
-    $title     = mysqli_real_escape_string($connection, $_POST['title']);
-    $kategori  = mysqli_real_escape_string($connection, $_POST['kategori']);
-    $price     = mysqli_real_escape_string($connection, $_POST['price']);
-    $rating    = mysqli_real_escape_string($connection, $_POST['rating']);
-    $deskripsi = mysqli_real_escape_string($connection, $_POST['deskripsi']);
+    $title       = mysqli_real_escape_string($connection, $_POST['title']);
+    $kategori    = mysqli_real_escape_string($connection, $_POST['kategori']);
+    $price       = mysqli_real_escape_string($connection, $_POST['price']);
+    // Menangkap input harga diskon (jika kosong, diset NULL)
+    $harga_diskon = !empty($_POST['harga_diskon']) ? mysqli_real_escape_string($connection, $_POST['harga_diskon']) : NULL;
+    $rating      = mysqli_real_escape_string($connection, $_POST['rating']);
+    $deskripsi   = mysqli_real_escape_string($connection, $_POST['deskripsi']);
 
     // Cek upload gambar
     if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === 0) {
@@ -36,9 +38,14 @@ if (isset($_POST['submit'])) {
             // Pindahkan file gambar ke folder tujuan
             if (move_uploaded_file($tmp_name, $target_dir . $new_filename)) {
 
-                // Query Insert ke Database
-                $query = "INSERT INTO menu (kategori, title, price, rating, gambar, deskripsi) 
-                          VALUES ('$kategori', '$title', '$price', '$rating', '$new_filename', '$deskripsi')";
+                // Query Insert ke Database (ditambah kolom harga_diskon)
+                if ($harga_diskon !== NULL) {
+                    $query = "INSERT INTO menu (kategori, title, price, harga_diskon, rating, gambar, deskripsi) 
+                              VALUES ('$kategori', '$title', '$price', '$harga_diskon', '$rating', '$new_filename', '$deskripsi')";
+                } else {
+                    $query = "INSERT INTO menu (kategori, title, price, harga_diskon, rating, gambar, deskripsi) 
+                              VALUES ('$kategori', '$title', '$price', NULL, '$rating', '$new_filename', '$deskripsi')";
+                }
 
                 $insert = mysqli_query($connection, $query);
 

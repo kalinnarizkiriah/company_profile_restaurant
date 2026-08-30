@@ -1,52 +1,40 @@
 <?php
-include "connection.php"; // Pastikan file koneksi sudah benar
+session_start();
+include "connection.php";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Mengambil data dari form HTML
     $full_name = mysqli_real_escape_string($connection, $_POST['full_name']);
-    $phone     = mysqli_real_escape_string($connection, $_POST['phone']);
+    $phone     = mysqli_real_escape_string($connection, $_POST['phone'] ?? ''); 
     $email     = mysqli_real_escape_string($connection, $_POST['email']);
-    $guests    = mysqli_real_escape_string($connection, $_POST['guests']);
+    $no_meja   = mysqli_real_escape_string($connection, $_POST['no_meja']);
     $date      = mysqli_real_escape_string($connection, $_POST['date']);
-    $time      = mysqli_real_escape_string($connection, $_POST['time']); // Format: HH:MM
+    $time      = mysqli_real_escape_string($connection, $_POST['time']);
 
-    // 1. Cek jumlah reservasi pada tanggal dan jam yang sama (menggunakan nama kolom date & time)
+    // Cek kuota meja/slot waktu yang sama
     $query_check  = "SELECT COUNT(*) AS total FROM reservations WHERE `date` = '$date' AND `time` = '$time'";
     $result_check = mysqli_query($connection, $query_check);
     $data_check   = mysqli_fetch_assoc($result_check);
 
     $total_booking = $data_check['total'];
-    $max_kuota     = 5; // Batas maksimal reservasi per slot jam
+    $max_kuota     = 5; 
 
     if ($total_booking >= $max_kuota) {
-        // 2. Hitung slot jam terdekat (otomatis ditambah 1.5 jam / 90 menit)
         $jam_asal       = strtotime($time);
         $jam_pilihan    = date('H.i', $jam_asal);
         $jam_alternatif = date('H.i', strtotime('+90 minutes', $jam_asal));
+        $pesan_error    = "Meja untuk jam $jam_pilihan sudah dipesan. Slot terdekat yang tersedia adalah jam $jam_alternatif.";
 
-        // Pesan Peringatan
-        $pesan_error = "Meja untuk jam $jam_pilihan sudah dipesan. Slot terdekat yang tersedia adalah jam $jam_alternatif.";
-
-        echo "<script>
-                alert('$pesan_error');
-                window.history.back();
-              </script>";
+        echo $pesan_error; // Kirim teks error ke fetch JavaScript
         exit();
     } else {
-        // 3. Simpan data reservasi jika kuota masih tersedia (< 5)
-        $query_insert = "INSERT INTO reservations (full_name, phone, email, guests, `date`, `time`, status_dibaca) 
-                         VALUES ('$full_name', '$phone', '$email', '$guests', '$date', '$time', 0)";
+        // Simpan data lengkap termasuk phone dan no_meja ke database
+        $query_insert = "INSERT INTO reservations (full_name, phone, email, no_meja, `date`, `time`, status_dibaca) 
+                         VALUES ('$full_name', '$phone', '$email', '$no_meja', '$date', '$time', 0)";
 
         if (mysqli_query($connection, $query_insert)) {
-            echo "<script>
-                    alert('Reservasi berhasil dibuat!');
-                    window.location.href = '../frontend/index.php#reservation';
-                  </script>";
+            echo "success"; // Beri respon sukses ke fetch JavaScript
         } else {
-            echo "<script>
-                    alert('Gagal membuat reservasi: " . mysqli_error($connection) . "');
-                    window.history.back();
-                  </script>";
+            echo "Gagal: " . mysqli_error($connection);
         }
     }
 }

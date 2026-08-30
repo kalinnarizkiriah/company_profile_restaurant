@@ -55,9 +55,10 @@ if (isset($_POST['login'])) {
     if ($user) {
         if ($password_input === $user['password']) {
             if ($user['role'] === 'customer') {
-                $_SESSION['login_customer'] = true;
-                $_SESSION['customer_username']     = $user['username'];     // DISESUAIKAN
-                $_SESSION['customer_nama_lengkap'] = $user['nama_lengkap']; // DISESUAIKAN
+                // PERBAIKAN: Menyimpan seluruh array $user (termasuk kolom 'id') ke session
+                $_SESSION['login_customer'] = $user; 
+                $_SESSION['customer_username']     = $user['username'];    
+                $_SESSION['customer_nama_lengkap'] = $user['nama_lengkap']; 
 
                 header("Location: ../index.php");
                 exit;

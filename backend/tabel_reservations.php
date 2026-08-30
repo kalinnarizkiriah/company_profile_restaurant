@@ -56,9 +56,8 @@ include "includes/header.php";
                                         <tr>
                                             <th scope="col" class="text-center" style="width: 50px;">No</th>
                                             <th scope="col">Nama Lengkap</th>
-                                            <th scope="col">No. Telepon</th>
                                             <th scope="col">Email</th>
-                                            <th scope="col" class="text-center">Jumlah Tamu</th>
+                                            <th scope="col">No. Meja & Area</th>
                                             <th scope="col" class="text-center">Tanggal</th>
                                             <th scope="col" class="text-center">Jam</th>
                                             <th scope="col" class="text-center" style="width: 160px;">Aksi</th>
@@ -76,9 +75,8 @@ include "includes/header.php";
                                         <tr>
                                             <td class="text-center"><?= $no++; ?></td>
                                             <td><strong><?= htmlspecialchars($tampil->full_name); ?></strong></td>
-                                            <td><?= htmlspecialchars($tampil->phone); ?></td>
                                             <td><?= htmlspecialchars($tampil->email); ?></td>
-                                            <td class="text-center"><?= htmlspecialchars($tampil->guests); ?></td>
+                                            <td><?= htmlspecialchars($tampil->no_meja); ?></td>
                                             <td class="text-center"><?= htmlspecialchars($tampil->date); ?></td>
                                             <td class="text-center"><?= htmlspecialchars($tampil->time); ?></td>
                                             <td class="text-center text-nowrap">
@@ -90,7 +88,7 @@ include "includes/header.php";
                                         } else {
                                         ?>
                                         <tr>
-                                            <td colspan="8" class="text-center py-4 text-muted">Belum ada data reservasi.</td>
+                                            <td colspan="7" class="text-center py-4 text-muted">Belum ada data reservasi.</td>
                                         </tr>
                                         <?php } ?>
                                     </tbody>

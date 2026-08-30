@@ -3,7 +3,7 @@ session_start();
 require '../../backend/connection.php';
 
 // Jika sudah login customer, redirect ke halaman utama frontend
-if (isset($_SESSION['login_customer'])) {
+if (isset($_SESSION['customer_logged_in']) && $_SESSION['customer_logged_in'] === true) {
     header("Location: ../index.php");
     exit;
 }
@@ -55,9 +55,11 @@ if (isset($_POST['login'])) {
     if ($user) {
         if ($password_input === $user['password']) {
             if ($user['role'] === 'customer') {
-                $_SESSION['login_customer'] = true;
-                $_SESSION['username']       = $user['username'];
-                $_SESSION['nama_lengkap']   = $user['nama_lengkap'];
+                // Disamakan dengan pengecekan session di form reservasi
+                $_SESSION['customer_logged_in'] = true;
+                $_SESSION['username']           = $user['username'];
+                $_SESSION['customer_name']      = $user['nama_lengkap']; // Diselaraskan untuk auto-fill form
+                $_SESSION['customer_email']     = $user['email'] ?? '';   // Mengantisipasi jika ada kolom email
 
                 header("Location: ../index.php");
                 exit;
@@ -124,11 +126,11 @@ if (isset($_POST['login'])) {
             <form action="" method="POST" autocomplete="off">
                 <div class="mb-3">
                     <label class="form-label">Username</label>
-                    <input type="text" name="username" class="form-control" placeholder="Masukkan username" required autocomplete="one-time-code" oninvalid="this.setCustomValidity('Harap isi bidang ini.')" oninput="this.setCustomValidity('')">
+                    <input type="text" name="username" class="form-control" placeholder="Masukkan username" required autocomplete="off">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" placeholder="Masukkan password" required autocomplete="new-password" oninvalid="this.setCustomValidity('Harap isi bidang ini.')" oninput="this.setCustomValidity('')">
+                    <input type="password" name="password" class="form-control" placeholder="Masukkan password" required autocomplete="current-password">
                 </div>
                 <button type="submit" name="login" class="btn btn-restoran w-100 py-2 mt-2 rounded-3">Masuk Sekarang</button>
             </form>
@@ -143,19 +145,19 @@ if (isset($_POST['login'])) {
             <form action="" method="POST" autocomplete="off">
                 <div class="mb-3">
                     <label class="form-label">Nama Lengkap</label>
-                    <input type="text" name="nama_lengkap" class="form-control" placeholder="Nama lengkap Anda" required autocomplete="off" oninvalid="this.setCustomValidity('Harap isi bidang ini.')" oninput="this.setCustomValidity('')">
+                    <input type="text" name="nama_lengkap" class="form-control" placeholder="Nama lengkap Anda" required autocomplete="off">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Username</label>
-                    <input type="text" name="username" class="form-control" placeholder="Buat username" required autocomplete="one-time-code" oninvalid="this.setCustomValidity('Harap isi bidang ini.')" oninput="this.setCustomValidity('')">
+                    <input type="text" name="username" class="form-control" placeholder="Buat username" required autocomplete="off">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" placeholder="Buat password" required autocomplete="new-password" oninvalid="this.setCustomValidity('Harap isi bidang ini.')" oninput="this.setCustomValidity('')">
+                    <input type="password" name="password" class="form-control" placeholder="Buat password" required autocomplete="new-password">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Konfirmasi Password</label>
-                    <input type="password" name="confirm_password" class="form-control" placeholder="Ulangi password" required autocomplete="new-password" oninvalid="this.setCustomValidity('Harap isi bidang ini.')" oninput="this.setCustomValidity('')">
+                    <input type="password" name="confirm_password" class="form-control" placeholder="Ulangi password" required autocomplete="new-password">
                 </div>
                 <button type="submit" name="register" class="btn btn-restoran w-100 py-2 mt-2 rounded-3">Daftar Akun</button>
             </form>

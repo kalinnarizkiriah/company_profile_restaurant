@@ -6,9 +6,11 @@ $badge_text       = $profile['badge_text'] ?? '';
 $gambar_hero      = $profile['gambar_hero'] ?? '';
 $teks_promo       = $profile['teks_promo'] ?? '';
 $waktu_pengiriman = $profile['waktu_pengiriman'] ?? '';
-$teks_rating       = $profile['teks_rating'] ?? '';
+$teks_rating      = $profile['teks_rating'] ?? '';
 
 // 2. Mewarnai "Makanan Cepat Saji" / "Delicious Fast Food" menjadi merah (#e52e2e)
+// Perhatikan: htmlspecialchars() ditaruh di dalam sebelum str_replace, 
+// atau string hasil replace tidak dibungkus htmlspecialchars lagi agar tag <span> terbaca HTML-nya.
 $nama_highlight = str_replace(
     ['Makanan Cepat Saji', 'Delicious Fast Food', 'makanan cepat saji', 'delicious fast food'], 
     [
@@ -19,6 +21,18 @@ $nama_highlight = str_replace(
     ], 
     htmlspecialchars($nama)
 );
+
+// 3. Menyiapkan Teks Rating Otomatis dari Database Ulasan 
+// (Variabel $rating_avg dan $formatted_reviews sudah diproses di index.php)
+if (!empty($teks_rating)) {
+    // Jika admin mengisi manual di database, gunakan isian admin
+    $display_rating_num = htmlspecialchars($teks_rating);
+    $display_rating_desc = 'Rating';
+} else {
+    // Jika kosong, ambil otomatis dari rata-rata ulasan database
+    $display_rating_num = (isset($rating_avg) ? $rating_avg : '5.0') . ' / 5';
+    $display_rating_desc = (isset($formatted_reviews) ? $formatted_reviews : 'Ulasan');
+}
 ?>
 
 <!-- ============================================================
@@ -39,7 +53,7 @@ $nama_highlight = str_replace(
                <span><?= htmlspecialchars($badge_text != '' ? $badge_text : '#1 Restoran Khas Jogja'); ?></span>
             </div>
             
-            <!-- Judul Utama dengan Makanan Cepat Saji Berwarna Merah -->
+            <!-- Judul Utama dengan Makanan Cepat Saji Berwarna Merah (Tanpa htmlspecialchars luar agar span aktif) -->
             <h1 class="htitle"><?= $nama_highlight; ?></h1>
             
             <!-- Ambil deskripsi dari database -->
@@ -71,20 +85,13 @@ $nama_highlight = str_replace(
                <div class="fcard fc2">
                   <div class="fcoi y"><i class="fas fa-star"></i></div>
                   <div>
-                     <!-- Ambil teks_rating dari database -->
-                     <span class="fcnum">Rating</span>
-                     <span class="fcsm"><?= htmlspecialchars($teks_rating != '' ? $teks_rating : '4.9 / 5'); ?></span>
+                     <!-- Menggunakan Rating Otomatis dari Database Ulasan -->
+                     <span class="fcnum"><?= $display_rating_num; ?></span>
+                     <span class="fcsm"><?= $display_rating_desc; ?></span>
                   </div>
                </div>
                
-               <div class="fcard fc3">
-                  <div class="fcoi g"><i class="fas fa-clock"></i></div>
-                  <div>
-                     <!-- Ambil waktu_pengiriman dari database -->
-                     <span class="fcnum">Estimasi</span>
-                     <span class="fcsm"><?= htmlspecialchars($waktu_pengiriman != '' ? $waktu_pengiriman : '20 Menit'); ?></span>
-                  </div>
-               </div>
+             
             </div>
          </div>
       </div>

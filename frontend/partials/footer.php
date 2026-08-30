@@ -34,11 +34,11 @@
             <div class="ftit">Hubungi Kami</div>
             <div class="fci">
                <div class="fciico"><i class="fa-solid fa-location-dot"></i></div>
-               <div class="fciinfo"><strong>Alamat</strong>72 Perum. Gamping-Sleman,YK</div>
+               <div class="fciinfo"><strong>Alamat</strong>Gamping-Sleman,YK</div>
             </div>
             <div class="fci">
                <div class="fciico"><i class="fa-solid fa-phone"></i></div>
-               <div class="fciinfo"><strong>Telepon</strong>+62 858-7147-2153</div>
+               <div class="fciinfo"><strong>Telepon / WhatsApp</strong>+62 858-7147-2153</div>
             </div>
             <div class="fci">
                <div class="fciico"><i class="fa-solid fa-envelope"></i></div>

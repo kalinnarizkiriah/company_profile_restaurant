@@ -8,6 +8,14 @@ if (!isset($_SESSION['login_backend'])) {
 }
 
 include "connection.php";
+
+// === TAMBAHKAN QUERY INI DI SINI AGAR VARIABELNYA READY SEBELUM SIDEBAR DIMUAT ===
+$query_pesanan = "SELECT COUNT(*) AS jml FROM pesanan WHERE status_pesanan = 'Menunggu Konfirmasi' OR status_pesanan = 'Menunggu Pembayaran di Kasir'";
+$result_pesanan = mysqli_query($connection, $query_pesanan);
+$row_pesanan = mysqli_fetch_assoc($result_pesanan);
+$jumlah_pesanan_baru = $row_pesanan['jml'] ?? 0;
+// ==============================================================================
+
 include "includes/header.php";
 ?>
 

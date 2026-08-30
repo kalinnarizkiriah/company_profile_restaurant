@@ -66,6 +66,24 @@ if (isset($_GET['ajax_cart_action'])) {
 
 $query_profile = mysqli_query($connection, "SELECT * FROM tb_profile LIMIT 1");
 $profile       = mysqli_fetch_assoc($query_profile);
+
+// ==========================================
+// MENGHITUNG RATA-RATA RATING & TOTAL ULASAN OTOMATIS
+// ==========================================
+// Sesuaikan nama tabel 'ulasan' jika di database kamu berbeda (misal: 'review' atau 'tb_ulasan')
+$query_rating = mysqli_query($connection, "SELECT AVG(bintang) as rata_rata, COUNT(*) as total_ulasan FROM reviews");
+$data_rating  = mysqli_fetch_assoc($query_rating);
+
+// Ambil rata-rata, dibulatkan 1 angka di belakang koma (cth: 4.9). Jika kosong, default 5.0
+$rating_avg = ($data_rating && $data_rating['rata_rata']) ? number_format($data_rating['rata_rata'], 1) : '5.0';
+$total_reviews = $data_rating['total_ulasan'] ?? 0;
+
+// Format total ulasan (jika di atas 1000 bisa disingkat jadi 1k+, atau tampilkan angka asli)
+if ($total_reviews >= 1000) {
+    $formatted_reviews = round($total_reviews / 1000, 1) . 'k+ Ulasan';
+} else {
+    $formatted_reviews = $total_reviews . ' Ulasan';
+}
 ?>
 
 <!DOCTYPE html>
@@ -165,9 +183,9 @@ document.addEventListener("DOMContentLoaded", function() {
 // ==========================================
 function slugify(text) {
     return text.toString().toLowerCase().trim()
-        .replace(/\s+/g, '-')           // Ganti spasi dengan -
-        .replace(/[^\w\-]+/g, '')       // Hapus karakter non-word
-        .replace(/\-\-+/g, '-');        // Ganti ganda - dengan tunggal -
+        .replace(/\s+/g, '-')          // Ganti spasi dengan -
+        .replace(/[^\w\-]+/g, '')      // Hapus karakter non-word
+        .replace(/\-\-+/g, '-');       // Ganti ganda - dengan tunggal -
 }
 
 document.addEventListener("DOMContentLoaded", function() {

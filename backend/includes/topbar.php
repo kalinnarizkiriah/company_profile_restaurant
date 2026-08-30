@@ -16,12 +16,24 @@
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 
-                <!-- Menggunakan isset agar tidak melempar error Warning jika session belum terisi -->
+                <!-- Nama Lengkap -->
                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-    <?= isset($_SESSION['admin_nama_lengkap']) ? $_SESSION['admin_nama_lengkap'] : 'Administrator'; ?>
-</span>
+                    <?= isset($_SESSION['admin_nama_lengkap']) ? $_SESSION['admin_nama_lengkap'] : 'Administrator'; ?>
+                </span>
                 
-                <img class="img-profile rounded-circle" src="img/category/kalin.jpeg" style="width: 30px;">
+                <?php 
+                    // Cek role yang sedang login di session, lalu tentukan fotonya
+                    $role_login = $_SESSION['admin_role'] ?? '';
+                    
+                    if ($role_login === 'super_admin') {
+                        $foto_profil = 'img/category/kalin.jpeg'; // Foto khusus Super Admin (Kalinna)
+                    } else {
+                        $foto_profil = 'img/category/obet.jpeg';  // Foto khusus Admin biasa (silakan ganti nama file foto adminnya di sini)
+                    }
+                ?>
+
+                <!-- Foto Profil Dinamis -->
+                <img class="img-profile rounded-circle" src="<?= $foto_profil; ?>" style="width: 30px; height: 30px; object-fit: cover;">
             </a>
             
             <!-- Dropdown - User Information -->

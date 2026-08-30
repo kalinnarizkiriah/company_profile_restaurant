@@ -39,6 +39,13 @@
                 </span>
             </button>
 
+            <!-- Tombol Riwayat Pesanan -->
+<?php if (isset($_SESSION['login_customer'])) : ?>
+    <a href="partials/riwayat-pesanan.php" class="btn text-white text-decoration-none d-flex align-items-center gap-1 px-3 py-2" style="background-color: #d9230f; border: none; border-radius: 10px; font-size: 0.95rem; box-shadow: 0 4px 10px rgba(217, 35, 15, 0.3);">
+        <i class="fas fa-history"></i> Riwayat
+    </a>
+<?php endif; ?>
+
             <?php if (isset($_SESSION['login_customer'])) : ?>
                 <!-- TAMPILAN USER SUDAH LOGIN -->
                 <div class="custom-dropdown position-relative" style="z-index: 99999;">

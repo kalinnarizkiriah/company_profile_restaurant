@@ -18,15 +18,13 @@ if (isset($_POST['login'])) {
 
     if ($user) {
         if ($password_input === $user['password']) {            
-            if ($user['role'] === 'admin') {
-               if ($user['role'] === 'admin') {
-    $_SESSION['login_backend'] = true;
-    $_SESSION['admin_username']     = $user['username'];     // Ganti jadi admin_username
-    $_SESSION['admin_nama_lengkap'] = $user['nama_lengkap']; // Ganti jadi admin_nama_lengkap
+            // Mengizinkan akun dengan role super_admin atau admin untuk masuk
+            if ($user['role'] === 'super_admin' || $user['role'] === 'admin') {
+                $_SESSION['login_backend'] = true;
+                $_SESSION['admin_username']     = $user['username']; 
+                $_SESSION['admin_nama_lengkap'] = $user['nama_lengkap']; 
+                $_SESSION['admin_role']         = $user['role']; 
 
-    header("Location: index.php");
-    exit;
-}
                 header("Location: index.php");
                 exit;
             } else {
@@ -64,7 +62,7 @@ if (isset($_POST['login'])) {
     <div class="text-center mb-3">
         <img src="img/category/logojogja7.png" alt="Logo" style="height: 60px;" class="mb-2">
         <h4 class="fw-bold text-danger m-0">Resto Jogja</h4>
-        <p class="text-muted small">Silakan login Admin</p>
+        <p class="text-muted small">Silakan login</p>
     </div>
     
     <?php if ($error) : ?>

@@ -1,45 +1,32 @@
 <?php
-// Pastikan tidak ada output HTML sebelum header JSON
-header('Content-Type: application/json');
+session_start();
+include 'connection.php'; 
 
-// Koneksi Database
-if (file_exists("connection.php")) {
-    include "connection.php";
-} elseif (file_exists("../backend/connection.php")) {
-    include "../backend/connection.php";
-} else {
-    $connection = mysqli_connect("localhost", "root", "", "restaurant");
-}
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $no_pesanan = mysqli_real_escape_string($connection, $_POST['no_pesanan']);
+    $bintang    = mysqli_real_escape_string($connection, $_POST['bintang']);
+    $ulasan     = mysqli_real_escape_string($connection, $_POST['ulasan']);
 
-if (!$connection) {
-    echo json_encode(["status" => "error", "message" => "Koneksi database gagal"]);
-    exit;
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nama    = mysqli_real_escape_string($connection, trim($_POST['nama'] ?? ''));
-    $bintang = (int)($_POST['bintang'] ?? 5);
-    $ulasan  = mysqli_real_escape_string($connection, trim($_POST['ulasan'] ?? ''));
-
-    if (!empty($nama) && !empty($ulasan)) {
-        // Query Insert ke Database
-        $query = "INSERT INTO reviews (nama, bintang, ulasan) VALUES ('$nama', '$bintang', '$ulasan')";
-        
-        if (mysqli_query($connection, $query)) {
-            // Jika request via AJAX (Modal Frontend)
-            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-                echo json_encode(["status" => "success", "message" => "Ulasan berhasil ditambahkan"]);
-            } else {
-                // Jika dari Form Admin biasa
-                header("Location: tabel_reviews.php?status=success");
-                exit;
-            }
-        } else {
-            echo json_encode(["status" => "error", "message" => mysqli_error($connection)]);
+    // 1. Ambil nama pemesan asli dari tabel pesanan berdasarkan no_pesanan
+    $nama_pelanggan = "Pelanggan";
+    $q_pesanan = mysqli_query($connection, "SELECT nama_pemesan FROM pesanan WHERE no_pesanan = '$no_pesanan' LIMIT 1");
+    if ($q_pesanan && mysqli_num_rows($q_pesanan) > 0) {
+        $data_p = mysqli_fetch_assoc($q_pesanan);
+        if (!empty($data_p['nama_pemesan'])) {
+            $nama_pelanggan = $data_p['nama_pemesan'];
         }
-    } else {
-        echo json_encode(["status" => "error", "message" => "Nama dan ulasan tidak boleh kosong"]);
     }
+
+    // 2. Simpan ulasan ke database dengan WAJIB menyertakan no_pesanan
+    // (Pastikan tabel 'reviews' di database Anda memiliki kolom: id, no_pesanan, nama, bintang, ulasan, balasan)
+    $query_insert = "INSERT INTO reviews (no_pesanan, nama, bintang, ulasan) VALUES ('$no_pesanan', '$nama_pelanggan', '$bintang', '$ulasan')";
+    $execute = mysqli_query($connection, $query_insert);
+
+    // Redirect kembali ke halaman riwayat pesanan dengan membawa status sukses
+    header("Location: ../frontend/partials/riwayat-pesanan.php?status=sukses_ulasan");
+    exit;
+} else {
+    header("Location: ../frontend/partials/riwayat-pesanan.php");
     exit;
 }
 ?>

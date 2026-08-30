@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start();
 
 // Proteksi halaman login
@@ -8,7 +8,6 @@ if (!isset($_SESSION['login_backend'])) {
 }
 
 include "connection.php"; 
-
 include "includes/header.php"; 
 ?>
 
@@ -50,11 +49,13 @@ include "includes/header.php";
                                     <thead class="table-light">
                                         <tr>
                                             <th scope="col" class="text-center" style="width: 50px;">No</th>
-                                            <th scope="col">No. Pesanan</th>
+                                            <th scope="col" style="width: 130px; white-space: nowrap;">No. Pesanan</th>
                                             <th scope="col">Nama Pemesan</th>
                                             <th scope="col">No. HP / WA</th>
+                                            <th scope="col">Menu yang Dipesan</th> <!-- Ditambahkan: Kolom Menu Dipesan -->
                                             <th scope="col">Tipe</th>
-                                            <th scope="col">Catatan / No. Meja</th> <!-- Kolom Baru -->
+                                            <th scope="col">Catatan</th>    
+                                            <th scope="col">No. Meja</th>   
                                             <th scope="col">Pembayaran</th>
                                             <th scope="col">Total Bayar</th>
                                             <th scope="col">Status</th>
@@ -63,7 +64,7 @@ include "includes/header.php";
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php
+                                        <?php 
                                         $no = 1;
                                         $select_pesanan = mysqli_query($connection, "SELECT * FROM pesanan ORDER BY id DESC");
                                         
@@ -75,36 +76,78 @@ include "includes/header.php";
                                             <td><strong class="text-danger"><?= htmlspecialchars($tampil->no_pesanan); ?></strong></td>
                                             <td><?= htmlspecialchars($tampil->nama_pemesan); ?></td>
                                             <td><?= htmlspecialchars($tampil->no_hp); ?></td>
+                                            
+                                            <!-- Menampilkan Kolom Menu Dipesan -->
+                                            <td>
+                                                <span class="fw-semibold text-dark">
+                                                    <?= !empty($tampil->menu_dipesan) ? htmlspecialchars($tampil->menu_dipesan) : '<span class="text-muted">Tidak ada rincian menu</span>'; ?>
+                                                </span>
+                                            </td>
+
                                             <td><span class="badge bg-secondary text-white"><?= htmlspecialchars($tampil->tipe_pesanan); ?></span></td>
                                             
-                                            <!-- Menampilkan Data Catatan / Nomor Meja -->
+                                            <!-- Kolom Catatan Terpisah -->
                                             <td><?= !empty($tampil->catatan) ? htmlspecialchars($tampil->catatan) : '<span class="text-muted">-</span>'; ?></td>
+                                            
+                                            <!-- Kolom No. Meja Terpisah -->
+                                            <td><?= !empty($tampil->no_meja) ? htmlspecialchars($tampil->no_meja) : '<span class="text-muted">-</span>'; ?></td>
                                             
                                             <td><?= htmlspecialchars($tampil->metode_pembayaran); ?></td>
                                             <td class="fw-bold">Rp <?= number_format($tampil->total_bayar, 0, ',', '.'); ?></td>
                                             <td>
-                                                <?php if ($tampil->status_pesanan == 'Menunggu Konfirmasi' || $tampil->status_pesanan == 'Menunggu Pembayaran di Kasir') : ?>
-                                                    <span class="badge bg-warning text-dark"><?= htmlspecialchars($tampil->status_pesanan); ?></span>
-                                                <?php elseif ($tampil->status_pesanan == 'Diproses') : ?>
-                                                    <span class="badge bg-info text-dark"><?= htmlspecialchars($tampil->status_pesanan); ?></span>
+                                                <?php 
+                                                    $status = trim($tampil->status_pesanan);
+                                                    if ($status == 'Menunggu' || $status == 'Menunggu Konfirmasi' || $status == 'Menunggu Pembayaran di Kasir') : 
+                                                ?>
+                                                    <span class="badge bg-warning text-dark"><?= htmlspecialchars($status); ?></span>
+                                                <?php elseif ($status == 'Pembayaran Berhasil') : ?>
+                                                    <span class="badge bg-success text-white">Pembayaran Berhasil</span>
+                                                <?php elseif ($status == 'Diproses') : ?>
+                                                    <span class="badge bg-info text-dark">Sedang Diproses</span>
                                                 <?php else : ?>
-                                                    <span class="badge bg-success text-white"><?= htmlspecialchars($tampil->status_pesanan); ?></span>
+                                                    <span class="badge bg-success text-white"><?= htmlspecialchars($status); ?></span>
                                                 <?php endif; ?>
                                             </td>
                                             <td><small class="text-muted"><?= htmlspecialchars($tampil->tanggal); ?></small></td>
+                                            
+                                            <!-- Tombol Aksi Bertahap -->
                                             <td class="text-center text-nowrap">
-                                                <!-- Tombol Ubah Status Langsung -->
-                                                <a href="update_status.php?id=<?= $tampil->id; ?>&status=Diproses" class="btn btn-sm btn-info text-dark fw-bold" title="Ubah ke Diproses">
-                                                    <i class="fas fa-spinner"></i> Proses
-                                                </a>
-                                                <a href="update_status.php?id=<?= $tampil->id; ?>&status=Selesai" class="btn btn-sm btn-success fw-bold" title="Ubah ke Selesai">
-                                                    <i class="fas fa-check"></i> Selesai
-                                                </a>
+                                                <?php if ($status == 'Menunggu' || $status == 'Menunggu Konfirmasi' || $status == 'Menunggu Pembayaran di Kasir') : ?>
+                                                    <!-- Tombol 1: Ubah ke 'Pembayaran Berhasil' -->
+                                                    <a href="update_status.php?id=<?= $tampil->id; ?>&status=Pembayaran Berhasil" class="btn btn-sm btn-success fw-bold mb-1" title="Konfirmasi Pembayaran Berhasil">
+                                                        <i class="fas fa-check-circle"></i> Konfirmasi
+                                                    </a>
+                                                    <!-- Tombol Hapus -->
+                                                    <a href="delete_pesanan.php?id=<?= $tampil->id; ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Yakin ingin menghapus data pesanan ini?')" title="Hapus">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
 
-                                                <!-- Tombol Hapus -->
-                                                <a href="delete_pesanan.php?id=<?= $tampil->id; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus data pesanan ini?')" title="Hapus">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
+                                                <?php elseif ($status == 'Pembayaran Berhasil') : ?>
+                                                    <!-- Tombol 2: Ubah ke 'Diproses' -->
+                                                    <a href="update_status.php?id=<?= $tampil->id; ?>&status=Diproses" class="btn btn-sm btn-info fw-bold text-dark mb-1" title="Proses Pesanan">
+                                                        <i class="fas fa-spinner"></i> Proses
+                                                    </a>
+                                                    <!-- Tombol Hapus -->
+                                                    <a href="delete_pesanan.php?id=<?= $tampil->id; ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Yakin ingin menghapus data pesanan ini?')" title="Hapus">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+
+                                                <?php elseif ($status == 'Diproses') : ?>
+                                                    <!-- Tombol 3: Ubah ke 'Selesai' -->
+                                                    <a href="update_status.php?id=<?= $tampil->id; ?>&status=Selesai" class="btn btn-sm btn-success fw-bold mb-1" title="Selesaikan Pesanan">
+                                                        <i class="fas fa-check"></i> Selesai
+                                                    </a>
+                                                    <!-- Tombol Hapus -->
+                                                    <a href="delete_pesanan.php?id=<?= $tampil->id; ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Yakin ingin menghapus data pesanan ini?')" title="Hapus">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+
+                                                <?php else : ?>
+                                                    <!-- Jika Sudah Selesai, Hanya Tampilkan Tombol Hapus Saja -->
+                                                    <a href="delete_pesanan.php?id=<?= $tampil->id; ?>" class="btn btn-sm btn-danger mb-1" onclick="return confirm('Yakin ingin menghapus data pesanan ini?')" title="Hapus">
+                                                        <i class="fas fa-trash"></i> Hapus
+                                                    </a>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                         <?php 
@@ -112,7 +155,8 @@ include "includes/header.php";
                                         else :
                                         ?>
                                         <tr>
-                                            <td colspan="11" class="text-center py-4 text-muted">Belum ada pesanan masuk.</td>
+                                            <!-- Colspan disesuaikan menjadi 13 karena ada penambahan kolom -->
+                                            <td colspan="13" class="text-center py-4 text-muted">Belum ada pesanan masuk.</td>
                                         </tr>
                                         <?php endif; ?>
                                     </tbody>
@@ -141,24 +185,26 @@ include "includes/header.php";
     <?php include "includes/bottom.php"; ?>
 
     <!-- Skrip Realtime Notifikasi & Auto Refresh Tabel -->
+<!-- Skrip Realtime Notifikasi & Auto Refresh Tabel -->
 <script>
-let jumlahPesananSebelumnya = null;
+let jumlahMenungguSebelumnya = null;
 
 function cekPesananBaru() {
     fetch('cek_pesanan_baru.php')
     .then(response => response.json())
     .then(data => {
-        if (jumlahPesananSebelumnya === null) {
-            jumlahPesananSebelumnya = data.total;
-        } else if (data.total > jumlahPesananSebelumnya) {
-            jumlahPesananSebelumnya = data.total;
-            alert('🔔 Ada Pesanan Masuk Baru!');
-            location.reload();
+        if (jumlahMenungguSebelumnya === null) {
+            jumlahMenungguSebelumnya = data.total;
+        } else if (data.total !== jumlahMenungguSebelumnya) {
+            // Jika ada pesanan baru yang berstatus 'Menunggu', halaman otomatis reload
+            jumlahMenungguSebelumnya = data.total;
+            location.reload(); 
         }
     })
     .catch(error => console.error('Error checking new orders:', error));
 }
 
+// Cek setiap 3 detik secara otomatis
 setInterval(cekPesananBaru, 3000);
 </script>
 </body>
